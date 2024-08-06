@@ -58,11 +58,10 @@ func getKernel(utsname *unix.Utsname) string {
 }
 
 func main() {
-	printInfo := func(label, value string) string {
+	printInfo := func(label, value string) {
 		if value != "" {
-			return fmt.Sprintf("\x1b[34m%6s\x1b[0m ~ %s", label, value)
+			fmt.Printf("\x1b[34m%6s\x1b[0m ~ %s\n", label, value)
 		}
-		return ""
 	}
 
 	getHost := func() string {
@@ -323,36 +322,17 @@ func main() {
 		Host:     getHost(),
 	}
 
-	// Retrieve the logo
-	logo := GetLogo(osName)
-
-	// Make strings for injection
-	injectStrings := []string{
-		fmt.Sprintf("\x1b[34m%6s\x1b[0m", sysInfo.Host),
-		printInfo("os", sysInfo.OS),
-		printInfo("kern", sysInfo.Kernel),
-		printInfo("up", sysInfo.Uptime),
-		printInfo("wm", sysInfo.WM),
-		printInfo("term", sysInfo.Terminal),
-		printInfo("cpu", sysInfo.CPU),
-		printInfo("mem", sysInfo.Memory),
-		printInfo("host", sysInfo.Model),
-	}
+	fmt.Println(sysInfo.Host)
+	printInfo("os", sysInfo.OS)
+	printInfo("kern", sysInfo.Kernel)
+	printInfo("up", sysInfo.Uptime)
+	printInfo("wm", sysInfo.WM)
+	printInfo("term", sysInfo.Terminal)
+	printInfo("cpu", sysInfo.CPU)
+	printInfo("mem", sysInfo.Memory)
+	printInfo("host", sysInfo.Model)
 	if pkgs := sysInfo.Packages; pkgs != 0 {
-		injectStrings = append(injectStrings, printInfo("pkgs", strconv.Itoa(pkgs)))
-	}
-
-	// Ensure logo and injectStrings are of equal length
-	for len(logo) < len(injectStrings) {
-		logo = append(logo, "")
-	}
-	for len(injectStrings) < len(logo) {
-		injectStrings = append(injectStrings, "")
-	}
-
-	// Print the logo and system info side by side
-	for i := 0; i < len(logo); i++ {
-		fmt.Printf("%-15s\t%s\n", logo[i], injectStrings[i])
+		printInfo("pkgs", strconv.Itoa(pkgs))
 	}
 }
 
