@@ -1,5 +1,5 @@
 // TODO: Use syscalls for everything
-// efetch is a clone of https://raw.githubusercontent.com/eepykate/fet.sh/master/fet.sh
+// jfetch is a clone of [fet.sh](https://raw.githubusercontent.com/eepykate/fet.sh/master/fet.sh), we use the ASCII art from [`pfetch`](https://github.com/Un1q32/pfetch)
 package main
 
 import (
@@ -44,7 +44,18 @@ func getUptime(info *unix.Sysinfo_t) string {
 	days := uptime / (24 * 3600)
 	hours := (uptime % (24 * 3600)) / 3600
 	minutes := (uptime % 3600) / 60
-	return fmt.Sprintf("%dd %02d:%02d", days, hours, minutes)
+
+	var result string
+	if days > 0 {
+		result += fmt.Sprintf("%dd ", days)
+	}
+	if hours > 0 {
+		result += fmt.Sprintf("%dh ", hours)
+	}
+	if minutes > 0 || (days == 0 && hours == 0) {
+		result += fmt.Sprintf("%dm", minutes)
+	}
+	return strings.TrimSpace(result)
 }
 
 func getKernel(utsname *unix.Utsname) string {
@@ -60,7 +71,7 @@ func getKernel(utsname *unix.Utsname) string {
 func main() {
 	printInfo := func(label, value string) string {
 		if value != "" {
-			return fmt.Sprintf("\x1b[34m%6s\x1b[0m ~ %s", label, value)
+			return fmt.Sprintf("\x1b[0m\x1b[34m%6s\x1b[0m ~ %s", label, value)
 		}
 		return ""
 	}
@@ -328,7 +339,7 @@ func main() {
 
 	// Make strings for injection
 	injectStrings := []string{
-		fmt.Sprintf("\x1b[34m%6s\x1b[0m", sysInfo.Host),
+		fmt.Sprintf("\x1b[0m\x1b[34m%6s\x1b[0m", sysInfo.Host),
 		printInfo("os", sysInfo.OS),
 		printInfo("kern", sysInfo.Kernel),
 		printInfo("up", sysInfo.Uptime),
