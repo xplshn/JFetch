@@ -1,4 +1,4 @@
-module efetch
+module github.com/xplshn/jfetch
 
 go 1.22.5
 
